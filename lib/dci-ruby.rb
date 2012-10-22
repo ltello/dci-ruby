@@ -65,11 +65,11 @@ class Context
     def assign_role_to_player(role_key, player)
       role_module     = roles[role_key]
       other_role_keys = roles.keys - [role_key]
-      player.extend(role_module, Forwardable)
-      player.instance_exec(self, other_role_keys) do |context, other_role_meths|
-        define_singleton_method(:context) {context}
-        def_delegators(:context, *other_role_meths)
+      player.extend(role_module, ::SingleForwardable)
+      player.singleton_class.class_exec(self) do |context|
+        define_method(:context) {context}
       end
+      player.def_delegators(:context, *other_role_keys)
       instance_variable_set(:"@#{role_key}", player)
     end
 end
