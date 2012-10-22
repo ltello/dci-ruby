@@ -19,10 +19,10 @@ class Context
   def self.role(role_key, &block)
     raise "role name must be a symbol" unless role_key.is_a?(Symbol)
     updated_roles = roles.merge(role_key => Module.new(&block))
-    singleton_class.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+    singleton_class.class_exec(updated_roles) do |new_roles|
       remove_method(:roles) rescue nil
-      define_method(:roles) { #{updated_roles} }
-    RUBY
+      define_method(:roles) { new_roles }
+    end
     attr_reader role_key
   end
 
