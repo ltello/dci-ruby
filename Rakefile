@@ -14,13 +14,13 @@ require 'rake'
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "dci-ruby"
-  gem.homepage = "http://github.com/ltello/dci-ruby"
-  gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "ltello@belor.jazztel.es"
-  gem.authors = ["Lorenzo Tello"]
+  gem.name        = "dci-ruby"
+  gem.homepage    = "http://github.com/ltello/dci-ruby"
+  gem.license     = "MIT"
+  gem.summary     = %Q{Make DCI paradigm available to Ruby applications by enabling developers defining contexts suclassing the new class Context. You define roles inside the definition. Match roles and player objects in context instanciation.}
+  gem.description = %Q{Make DCI paradigm available to Ruby applications}
+  gem.email       = "ltello8a@gmail.com"
+  gem.authors     = ["Lorenzo Tello"]
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
