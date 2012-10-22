@@ -19,7 +19,7 @@ class MoneyTransfer < Context
 
   def transfer(amount)
     puts "Begin transfer."
-    roles.each{ |role| role.transfer(amount) }
+    [source_account, destination_account].each { |role| role.transfer(amount) }
     puts "Transfer complete."
   end
 end
