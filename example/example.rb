@@ -1,50 +1,55 @@
 require 'dci-ruby'
 
 
-# We can think of a context as setting a scene.
-class MoneyTransfer < Context
-  role :source_account do
-    def transfer(amount)
-      decrease_balance(amount)
-      puts "Tranfered $#{amount} from account ##{account_id}."
-    end
-  end
+class CheckingAccount
+  attr_reader   :account_id
+  attr_accessor :balance
 
-  role :destination_account do
-    def transfer(amount)
-      increase_balance(amount)
-      puts "Tranfered $#{amount} into account ##{account_id}."
-    end
-  end
-
-  def transfer(amount)
-    puts "Begin transfer."
-    [source_account, destination_account].each { |role| role.transfer(amount) }
-    puts "Transfer complete."
-  end
-end
-
-class Account
   def initialize(account_id)
-    @account_id = account_id
-    @balance    = 0
-  end
-  def account_id
-    @account_id
-  end
-  def available_balance
-    @balance
-  end
-  def increase_balance(amount)
-    @balance += amount
-  end
-  def decrease_balance(amount)
-    @balance -= amount
+    @account_id, @balance = account_id, 0
   end
 end
 
-acct1 = Account.new(000100)
-acct2 = Account.new(000200)
 
-MoneyTransfer.new(:source_account      => acct1,
-                  :destination_account => acct2).transfer(50)
+class MoneyTransferContext < Context
+
+  # Roles Definitions
+
+    role :source_account do
+      def run_transfer_of(amount)
+        self.balance -= amount
+        puts "Source Account #{account_id} sent $#{amount} to Target Account #{target_account.account_id}."
+      end
+    end
+
+    role :target_account do
+      def run_transfer_of(amount)
+        self.balance += amount
+        puts "Target Account #{account_id} received $#{amount} from Source Account #{source_account.account_id}."
+      end
+    end
+
+
+  # Interactions
+
+    def run(amount)
+      puts "Balances Before: #{balances}"
+      source_account.run_transfer_of(amount)
+      target_account.run_transfer_of(amount)
+      puts "Balances After:  #{balances}"
+    end
+
+
+  private
+
+    def accounts
+      [source_account, target_account]
+    end
+
+    def balances
+      accounts.map {|account| "$#{account.balance}"}.join(' - ')
+    end
+end
+
+MoneyTransferContext.new(:source_account => CheckingAccount.new(1),
+                         :target_account => CheckingAccount.new(2)).run(100)
