@@ -4,27 +4,35 @@ require 'dci-ruby/kernel'
 
 class Context
 
-  # Every subclass of Context has is own class and instance method roles defined.
-  # The instance method delegates value to the class.
-  def self.inherited(subklass)
-    subklass.class_eval do
-      def self.roles; {} end
-      def roles; self.class.roles end
+  class << self
+
+    # Every subclass of Context has is own class and instance method roles defined.
+    # The instance method delegates value to the class.
+    def inherited(subklass)
+      subklass.class_eval do
+        def self.roles; {} end
+        def roles; self.class.roles end
+      end
     end
+
+
+    private
+
+      # The macro role is defined to allow a subclass of Context to define roles in its definition.
+      # Every new role redefines the role class method to contain a hash accumulating all defined roles in that subclass.
+      # An accessor to the object playing the new role is also defined and available in every instance of the context subclass.
+      def role(role_key, &block)
+        raise "role name must be a symbol" unless role_key.is_a?(Symbol)
+        updated_roles = roles.merge(role_key => Module.new(&block))
+        singleton_class.class_exec(updated_roles) do |new_roles|
+          remove_method(:roles) rescue nil
+          define_method(:roles) { new_roles }
+        end
+        attr_reader role_key
+      end
+
   end
 
-  # The macro role is defined to allow a subclass of Context to define roles in its definition.
-  # Every new role redefines the role class method to contain a hash accumulating all defined roles in that subclass.
-  # An accessor to the object playing the new role is also defined and available in every instance of the context subclass.
-  def self.role(role_key, &block)
-    raise "role name must be a symbol" unless role_key.is_a?(Symbol)
-    updated_roles = roles.merge(role_key => Module.new(&block))
-    singleton_class.class_exec(updated_roles) do |new_roles|
-      remove_method(:roles) rescue nil
-      define_method(:roles) { new_roles }
-    end
-    attr_reader role_key
-  end
 
   # Instances of a defined subclass of Context are initialized checking first that all subclass defined roles
   # are provided in the creation invocation raising an error if any of them is missing.
