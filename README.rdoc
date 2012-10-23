@@ -1,16 +1,44 @@
 = dci-ruby
 
-Description goes here.
+Data-Context-Interaction paradigm ready to be used in your Ruby application.
 
-== Contributing to dci-ruby
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
-* Fork the project.
-* Start a feature/bugfix branch.
-* Commit and push until you are happy with your contribution.
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+dci-ruby gives you the class Context to inherit from to create your own contexts:
+
+    class MoneyTransfer < Context
+
+      # Roles
+          role :source_account do
+            def transfer(amount)
+               balance -= amount
+               target_account.get_transfer(amount)
+            end
+          end
+
+          role :target_account do
+            def get_transfer(amount)
+              balance += amount
+            end
+          end
+
+      # Interactions
+          def run(amount)
+            source_account.transfer(amount)
+          end
+    end
+
+Every context defines some roles to be played by external objects (players) and their interactions. This way
+you have the whole agents and operations in a user case wrapped in just one entity instead of spreaded througout the
+whole application code.
+
+Use the defined contexts in your application, instantiating them wherever you need them in your code:
+
+    MoneyTransfer.new(:source_account => Account.new(1),
+                      :target_account => Account.new(2)).run(100)
+
+Role player objects (the two account instances above) respond to their corresponding role methods inside the context.
+Moreover, every role player has access to the rest of role players. That's why target_account is reachable inside source_account#transfer
+rolemethod.
+
 
 == Copyright
 
