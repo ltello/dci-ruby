@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "dci-ruby"
-  s.version = "0.4.0"
+  s.version = "0.4.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Lorenzo Tello"]
@@ -33,9 +33,7 @@ Gem::Specification.new do |s|
     "spec/interaction_spec.rb",
     "spec/role_spec.rb",
     "spec/roleplayers_spec.rb",
-    "spec/spec_helper.rb",
-    "test/helper.rb",
-    "test/test_dci-ruby.rb"
+    "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/ltello/dci-ruby"
   s.licenses = ["MIT"]
