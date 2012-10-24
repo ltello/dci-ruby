@@ -52,6 +52,7 @@ Role player objects (the two account instances above) respond to their correspon
 Moreover, every role player has access to the rest of role players. That's why target_account is reachable inside source_account#transfer
 rolemethod.
 
+See the examples folder for examples of use and the ([DCI-Sample] https://github.com/ltello/DCI-Sample) repository for a sample application using DCI througth this gem.
 
 == Copyright
 
