@@ -1,7 +1,7 @@
 = dci-ruby
 
 Trygve Reenskaug, the parent of MVC, proposes an evolution to traditional OO paradigm. (http://www.artima.com/articles/dci_vision.html).
-This gem makes Data-Context-Interaction paradigm ready to be used in your Ruby application.
+This gem makes Data-Context-Interaction paradigm ready to be used in your Ruby application. See also (http://rubysource.com/dci-the-evolution-of-the-object-oriented-paradigm/).
 
 
 == Installation
