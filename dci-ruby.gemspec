@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "dci-ruby"
-  s.version = "0.4.1"
+  s.version = "1.0.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Lorenzo Tello"]
-  s.date = "2012-10-23"
+  s.date = "2012-10-25"
   s.description = "Make DCI paradigm available to Ruby applications"
   s.email = "ltello8a@gmail.com"
   s.extra_rdoc_files = [
@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "dci-ruby.gemspec",
-    "example/example.rb",
+    "examples/money_transfer.rb",
     "lib/dci-ruby.rb",
     "lib/dci-ruby/kernel.rb",
     "spec/context_spec.rb",
