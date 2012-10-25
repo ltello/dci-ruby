@@ -32,7 +32,7 @@ class MoneyTransferContext < Context
 
   # Interactions
 
-    def run(amount)
+    def run
       puts "Balances Before: #{balances}"
       source_account.run_transfer_of(amount)
       target_account.run_transfer_of(amount)
@@ -52,4 +52,5 @@ class MoneyTransferContext < Context
 end
 
 MoneyTransferContext.new(:source_account => CheckingAccount.new(1),
-                         :target_account => CheckingAccount.new(2)).run(100)
+                         :target_account => CheckingAccount.new(2),
+                         :amount         => 500).run

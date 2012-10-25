@@ -37,9 +37,12 @@ class Context
   # Instances of a defined subclass of Context are initialized checking first that all subclass defined roles
   # are provided in the creation invocation raising an error if any of them is missing.
   # Once the previous check is met, every object playing in the context instance is associated to the stated role.
-  def initialize(players={})
-    check_all_roles_provided_in(players)
+  # Non players args are associated to instance_variables and readers defined.
+  def initialize(args={})
+    check_all_roles_provided_in!(args)
+    players, noplayers = args.partition {|key, value| roles.keys.include?(key)}.map {|group| Hash[*group.flatten]}
     assign_roles_to_players(players)
+    define_attr_readers_for_no_players(noplayers)
   end
 
 
@@ -47,7 +50,7 @@ class Context
 
     # Checks there is an intented player for every role.
     # Raises and error message in case of missing roles.
-    def check_all_roles_provided_in(players={})
+    def check_all_roles_provided_in!(players={})
       missing_roles = missing_roles(players)
       raise "missing roles #{missing_roles}" unless missing_roles.empty?
     end
@@ -79,5 +82,15 @@ class Context
       end
       player.def_delegators(:context, *other_role_keys)
       instance_variable_set(:"@#{role_key}", player)
+    end
+
+    def define_attr_readers_for_no_players(vars={})
+      vars.each do |name, value|
+        instance_variable_set(:"@#{name}", value)
+        singleton_class.class_exec(name.to_sym) do |varkey|
+          attr_reader varkey
+        end
+      end
+
     end
 end
