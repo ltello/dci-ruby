@@ -1,3 +1,4 @@
+require 'forwardable'
 require 'dci-ruby'
 
 
@@ -5,27 +6,36 @@ class CheckingAccount
   attr_reader   :account_id
   attr_accessor :balance
 
-  def initialize(account_id)
-    @account_id, @balance = account_id, 0
+  def initialize(account_id, initial_balance=0)
+    @account_id, @balance = account_id, initial_balance
   end
 end
 
 
-class MoneyTransferContext < Context
+class MoneyTransferContext < DCI::Context
 
   # Roles Definitions
 
     role :source_account do
+      extend ::Forwardable
+      def_delegators :player, :account_id, :balance, :balance=
+
       def run_transfer_of(amount)
         self.balance -= amount
-        puts "Source Account #{account_id} sent $#{amount} to Target Account #{target_account.account_id}."
+        puts "\tAccount(\##{account_id}) sent #{amount}€ to Account(\##{target_account.account_id})."
       end
     end
 
     role :target_account do
+      #[:account_id, :balance, :balance=].each {|field| define_method(field) {|*args| player.send(field, *args)}}
+      def account_id;      player.account_id       end
+      def balance;         player.balance          end
+      def balance=(amount) player.balance=(amount) end
+      private :balance=
+
       def run_transfer_of(amount)
         self.balance += amount
-        puts "Target Account #{account_id} received $#{amount} from Source Account #{source_account.account_id}."
+        puts "\tAccount(\##{account_id}) received #{amount}€ from Account(\##{source_account.account_id})."
       end
     end
 
@@ -47,10 +57,10 @@ class MoneyTransferContext < Context
     end
 
     def balances
-      accounts.map {|account| "$#{account.balance}"}.join(' - ')
+      accounts.map {|account| "#{account.balance}€"}.join(' - ')
     end
 end
 
-MoneyTransferContext.new(:source_account => CheckingAccount.new(1),
+MoneyTransferContext.new(:source_account => CheckingAccount.new(1, 500),
                          :target_account => CheckingAccount.new(2),
                          :amount         => 500).run
