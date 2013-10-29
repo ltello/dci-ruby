@@ -42,7 +42,7 @@ class MoneyTransferContext < DCI::Context
 
   # Interactions
 
-    def run
+    def run(amount=settings(:amount))
       puts "Balances Before: #{balances}"
       source_account.run_transfer_of(amount)
       target_account.run_transfer_of(amount)
@@ -61,6 +61,13 @@ class MoneyTransferContext < DCI::Context
     end
 end
 
-MoneyTransferContext.new(:source_account => CheckingAccount.new(1, 500),
-                         :target_account => CheckingAccount.new(2),
-                         :amount         => 500).run
+acc1 = CheckingAccount.new(1, 1000)
+acc2 = CheckingAccount.new(2)
+
+MoneyTransferContext.new(:source_account => acc1,
+                         :target_account => acc2,
+                         :amount         => 200).run
+4.times do
+  MoneyTransferContext.new(:source_account => acc1,
+                           :target_account => acc2).run(200)
+end
