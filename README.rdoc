@@ -49,11 +49,14 @@ Use the defined contexts, instantiating them wherever you need in your code:
     MoneyTransfer.new(:source_account => Account.new(1),
                       :target_account => Account.new(2)).run(100)
 
-In a context instance, every role instanciates an object (roleplayer) that gathers the behaviour defined inside its role,
-and that roleplayer object has private access to the original object adopting the role (player): the Account instances above are players.
+In a context instance, every role instantiates an object (roleplayer) that gathers the behaviour defined inside its role,
+and has private access to the original object adopting the role (player): the Account instances above are players.
 Instances of MoneyTransfer::SourceAccount and MoneyTransfer::TargetAccount accessible inside MoneyTransfer.new via
 the private instance_methods #source_account and #target_account are roleplayers.
 Also, every roleplayer has private access to the rest of roleplayers in its context.
+
+Unlike extending players with role modules this Presenter approach gets on well with ruby method call caching mechanism.
+(see Tony Arcieri's article {DCI in Ruby is completely broken}[http://tonyarcieri.com/dci-in-ruby-is-completely-broken])
 
 When instanciating a Context, the extra no-role pairs given as arguments are read-only attributes accessible inside the instance:
 
