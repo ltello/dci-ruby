@@ -1,4 +1,4 @@
-require 'forwardable'
+require 'dci-ruby/version'
 require 'dci-ruby/kernel'
 
 
