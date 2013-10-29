@@ -8,60 +8,60 @@ This gem makes Data-Context-Interaction paradigm ready to be used in your Ruby a
 
 Install as usual, either with rubygems
     gem install dci-ruby
-or including it in your Gemfile and then running bundle install:
+
+or including it in your Gemfile and running bundle install:
     # Gemfile
     gem "dci-ruby"
 
 
 == Use
 
-dci-ruby gives you the class Context to inherit from to create your own contexts:
+dci-ruby gives you the class DCI::Context to inherit from to create your own contexts:
 
-    class MoneyTransfer < Context
+    class MoneyTransfer < DCI::Context
 
       # Roles
           role :source_account do
             def transfer(amount)
-               balance -= amount
-               target_account.get_transfer(amount)
+              player.balance -= amount
             end
           end
 
           role :target_account do
             def get_transfer(amount)
-              balance += amount
+              player.balance += amount
             end
           end
 
       # Interactions
-          def run(amount)
+          def run(amount=default_amount)
             source_account.transfer(amount)
-          end
-
-          def run_default
-            source_account.transfer(default_amount)
+            target_account.get_transfer(amount)
           end
     end
 
 Every context defines some roles to be played by external objects (players) and their interactions. This way
-you have the whole agents and operations in a user case wrapped in just one entity instead of spreaded througout the
-whole application code.
+you have all the agents and operations in a user case wrapped in just one entity instead of spreaded throughout the
+application code.
 
-Use the defined contexts in your application, instantiating them wherever you need them in your code:
+Use the defined contexts, instantiating them wherever you need in your code:
 
     MoneyTransfer.new(:source_account => Account.new(1),
                       :target_account => Account.new(2)).run(100)
 
-Role player objects (the two account instances above) respond to their corresponding role methods inside the context.
-Moreover, every role player has access to the rest of role players. That's why target_account is reachable inside source_account#transfer
-rolemethod.
+In a context instance, every role instanciates an object (roleplayer) that gathers the behaviour defined inside its role,
+and that roleplayer object has private access to the original object adopting the role (player): the Account instances above are players.
+Instances of MoneyTransfer::SourceAccount and MoneyTransfer::TargetAccount accessible inside MoneyTransfer.new via
+the private instance_methods #source_account and #target_account are roleplayers.
+Also, every roleplayer has private access to the rest of roleplayers in its context.
+
 When instanciating a Context, the extra no-role pairs given as arguments are read-only attributes accessible inside the instance:
 
     MoneyTransfer.new(:source_account => Account.new(1),
                       :target_account => Account.new(2),
-                      :default_amount => 500).run_default
+                      :default_amount => 500).run
 
-here, default_amount is not a roleplayer (has no associated role) but is still accessible in the interactions.
+here, default_amount is not a player (has no associated role) but is still accessible in the interactions.
 
 See the examples[https://github.com/ltello/dci-ruby/tree/master/examples] folder for examples of use and the DCI-Sample[https://github.com/ltello/DCI-Sample] repository for a sample application using DCI through this gem.
 
