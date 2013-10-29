@@ -2,19 +2,32 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe 'Role' do
 
-  context "When defining roles inside a Context subclass..." do
+  context "When defining roles inside a DCI::Context subclass..." do
     before(:all) do
-      class ExampleContext < Context
+      class TestingRoleContext < DCI::Context
         role :rolename do
         end
         role :anotherrolename do
         end
       end
     end
-    it("You can define as many as you want") {ExampleContext.roles.keys.size.should eql(2)}
-    it("Each rolename must be provided as a symbol...") {ExampleContext.roles.keys.should include(:rolename)}
-    it("...and not as a string") {expect {class ExampleContext < Context; role "rolename" do; end; end}.to raise_error}
-    it("A block defining rolemethods can also be provided.") {ExampleContext.roles[:rolename].class.should be(Module)}
+    it("...you can define as many as you want.") do
+      TestingRoleContext.roles.keys.size.should eql(2)
+    end
+    it("Each rolename must be provided as a symbol...") do
+      TestingRoleContext.roles.keys.should include(:rolename, :anotherrolename)
+    end
+    it("...and not as a string.") do
+      expect do
+        class TestingRoleContext < DCI::Context
+          role "rolename" do
+          end
+        end
+      end.to raise_error
+    end
+    it("A block defining rolemethods must be provided as well.") do
+      TestingRoleContext.roles[:rolename].should be_a(Class)
+    end
   end
 
 end
