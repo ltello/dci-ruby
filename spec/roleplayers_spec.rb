@@ -63,11 +63,11 @@ describe 'RolePlayers' do
       @testing_roleplayers_context.send(:role2).send(:player).name.should eq('player2')
     end
 
-    it("Roleplayers have private access to other roleplayers in their context...") do
-      @testing_roleplayers_context.send(:role2).private_methods(false).should include('role1')
-      @testing_roleplayers_context.send(:role2).rolemethod2.should eql(@testing_roleplayers_context.send(:role1))
+    it("Roleplayers have private access to other roleplayers in their context through methods named after their keys.") do
+      @testing_roleplayers_context.send(:role2).private_methods.should include('role1')
+      @testing_roleplayers_context.send(:role2).rolemethod2.should be(@testing_roleplayers_context.send(:role1))
     end
-    it("...and even the context itself.") do
+    it("However, they dont have a method to access the context.") do
       expect {@testing_roleplayers_context.send(:role2).send(:context)}.to raise_error(NoMethodError)
       @testing_roleplayers_context.send(:role2).instance_variables.should include('@context')
       @testing_roleplayers_context.send(:role2).instance_variable_get(:@context).should be(@testing_roleplayers_context)

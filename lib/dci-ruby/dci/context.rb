@@ -19,16 +19,51 @@ module DCI
 
       private
 
-        # The macro role is defined to allow a subclass of Context to define roles in its definition.
-        # Every new role redefines the role class method to contain a hash accumulating all defined roles in that subclass.
-        # An accessor to the object playing the new role is also defined and available in every instance of the context subclass.
-        def role(role_key, &block)
-          raise "role name must be a symbol" unless role_key.is_a?(Symbol)
-          new_klass_name = role_key.to_s.split(/\_+/).map(&:capitalize).join('')
+        # The macro role is defined to allow a subclass of Context to define roles in its definition body.
+        # Every new role is added to the hash of roles in that Context subclass.
+        # A reader to access the object playing the new role is also defined and available in every instance of the context subclass.
+        # Also, readers to allow each other role access are defined.
+        def role(rolekey, &block)
+          raise "role name must be a symbol" unless rolekey.is_a?(Symbol)
+          create_role_from(rolekey, &block)
+          define_reader_for_role(rolekey)
+          define_mate_roleplayers_readers_after_newrole(rolekey)
+        end
+
+        # Adds a new entry to the roles accumulator hash.
+        def create_role_from(key, &block)
+          roles.merge!(key => create_role_subclass_from(key, &block))
+        end
+
+        # Defines and return a new subclass of DCI::Role named after the given rolekey and with body the given block.
+        def create_role_subclass_from(rolekey, &block)
+          new_klass_name = rolekey.to_s.split(/\_+/).map(&:capitalize).join('')
           const_set(new_klass_name, Class.new(::DCI::Role, &block))
-          roles.merge!(role_key => const_get(new_klass_name.to_sym))
-          attr_reader role_key
-          private role_key
+        end
+
+        # Defines a private reader to allow a context instance access to the roleplayer object associated to the given rolekey.
+        def define_reader_for_role(rolekey)
+          attr_reader rolekey
+          private rolekey
+        end
+
+        # After a new role is defined, you've got to create a reader method for this new role in the rest of context
+        # roles, and viceverse: create a reader method in the new role klass for each of the other roles in the context.
+        # This method does exactly this.
+        def define_mate_roleplayers_readers_after_newrole(new_rolekey)
+          new_roleklass = roles[new_rolekey]
+          mate_roles    = mate_roles_of(new_rolekey)
+          mate_roles.each do |mate_rolekey, mate_roleklass|
+            mate_roleklass.add_role_reader_for!(new_rolekey)
+            new_roleklass.add_role_reader_for!(mate_rolekey)
+          end
+        end
+
+        # For a give role key, returns a hash with the rest of the roles (pair :rolekey => roleklass) in the context it belongs to.
+        def mate_roles_of(rolekey)
+          roles.dup.tap do |roles|
+            roles.delete(rolekey)
+          end
         end
 
     end
@@ -40,19 +75,24 @@ module DCI
     # Non players args are associated to instance_variables and readers defined.
     def initialize(args={})
       check_all_roles_provided_in!(args)
-      players, noplayers = args.partition {|key, value| roles.has_key?(key)}.map {|group| Hash[*group.flatten]}
+      players, noplayers = args.partition {|key, *| roles.has_key?(key)}.map {|group| Hash[*group.flatten]}
       assign_roles_to_players(players)
-      define_readers_for_no_players(noplayers)
+      @settings = noplayers
     end
 
 
     private
 
+      # Private access to the extra args received in the instantiation.
+      def settings(key)
+        @settings[key]
+      end
+
       # Checks there is a player for each role.
       # Raises and error message in case of missing roles.
       def check_all_roles_provided_in!(players={})
-        missing_roles = missing_roles(players)
-        raise "missing roles #{missing_roles}" unless missing_roles.empty?
+        missing_rolekeys = missing_roles(players)
+        raise "missing roles #{missing_rolekeys}" unless missing_rolekeys.empty?
       end
 
       # The list of roles with no player provided
@@ -62,33 +102,32 @@ module DCI
 
       # Associates every role to the intended player.
       def assign_roles_to_players(players={})
-        roles.keys.each do |role_key|
-          assign_role_to_player(role_key, players[role_key])
+        roles.keys.each do |rolekey|
+          assign_role_to_player(rolekey, players[rolekey])
         end
       end
 
       # Associates a role to an intended player:
-      #   - A new role instance is created from the associated role_key class and the player to get that role.
+      #   - A new role instance is created from the associated rolekey class and the player to get that role.
       #   - The new role instance has access to the context it is playing.
       #   - The new role instance has access to the rest of players in its context through instance methods named after their role keys.
       #   - The context instance has access to this new role instance through an instance method named after the role key.
-      def assign_role_to_player(role_key, player)
-        role_klass      = roles[role_key]
-        other_role_keys = roles.keys - [role_key]
-        role_instance   = role_klass.new(:player => player, :context => self, :role_mate_keys => other_role_keys)
-        instance_variable_set(:"@#{role_key}", role_instance)
+      def assign_role_to_player(rolekey, player)
+        role_klass    = roles[rolekey]
+        role_instance = role_klass.new(:player => player, :context => self)
+        instance_variable_set(:"@#{rolekey}", role_instance)
       end
 
-      # For each given pair in vars, define a private method named the key that returns the entry associated value.
-      def define_readers_for_no_players(vars={})
-        vars.each do |name, value|
-          instance_variable_set(:"@#{name}", value)
-          singleton_class.class_exec(name.to_sym) do |varkey|
-            private
-              attr_reader varkey
-          end
-        end
-      end
+      # # For each given pair in vars, define a private method named the key that returns the entry associated value.
+      # def define_readers_for_no_players(vars={})
+      #   vars.each do |name, value|
+      #     instance_variable_set(:"@#{name}", value)
+      #     singleton_class.class_exec(name.to_sym) do |varkey|
+      #       private
+      #         attr_reader varkey
+      #     end
+      #   end
+      # end
 
   end
 

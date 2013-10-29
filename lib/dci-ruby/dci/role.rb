@@ -10,6 +10,13 @@ module DCI
         super
       end
 
+      # Defines a new reader instance method for a context mate role, delegating it to the context object.
+      def add_role_reader_for!(rolekey)
+        return if private_method_defined?(rolekey)
+        define_method(rolekey) {@context.send(rolekey)}
+        private rolekey
+      end
+
     end
 
     # Opts:
@@ -19,7 +26,6 @@ module DCI
     def initialize(opts={})
       @player  = opts[:player]
       @context = opts[:context]
-      define_role_mate_methods!(opts[:role_mate_keys])
     end
 
 
@@ -30,20 +36,5 @@ module DCI
         @player
       end
 
-      # For each role in the context, define a method so inside a role you can access all the others.
-      def define_role_mate_methods!(role_mate_keys)
-        self.class.class_exec(role_mate_keys) do |other_role_keys|
-          other_role_keys.each do |role_key|
-            if not private_method_defined?(role_key)
-              define_method(role_key) do
-                @context.send(role_key)
-              end
-              private role_key
-            end
-          end
-        end
-      end
-
   end
-
 end
