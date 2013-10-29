@@ -34,17 +34,17 @@ dci-ruby gives you the class DCI::Context to inherit from to create your own con
           end
 
       # Interactions
-          def run(amount=default_amount)
+          def run(amount=settings(:amount))
             source_account.transfer(amount)
             target_account.get_transfer(amount)
           end
     end
 
 Every context defines some roles to be played by external objects (players) and their interactions. This way
-you have all the agents and operations in a user case wrapped in just one entity instead of spreaded throughout the
+you have all the agents and operations in a user case wrapped in just one entity instead of spread out throughout the
 application code.
 
-Use the defined contexts, instantiating them wherever you need in your code:
+Use the defined contexts, instantiating them, wherever you need in your code:
 
     MoneyTransfer.new(:source_account => Account.new(1),
                       :target_account => Account.new(2)).run(100)
@@ -62,9 +62,9 @@ When instanciating a Context, the extra no-role pairs given as arguments are rea
 
     MoneyTransfer.new(:source_account => Account.new(1),
                       :target_account => Account.new(2),
-                      :default_amount => 500).run
+                      :amount => 500).run
 
-here, default_amount is not a player (has no associated role) but is still accessible in the interactions.
+here, :amount is not a player (has no associated role) but is still privately accessible in the interactions via settings(:amount).
 
 See the examples[https://github.com/ltello/dci-ruby/tree/master/examples] folder for examples of use and the DCI-Sample[https://github.com/ltello/DCI-Sample] repository for a sample application using DCI through this gem.
 
