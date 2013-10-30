@@ -26,11 +26,8 @@ class MoneyTransferContext < DCI::Context
     end
 
     role :target_account do
-      #[:account_id, :balance, :balance=].each {|field| define_method(field) {|*args| player.send(field, *args)}}
-      def account_id;      player.account_id       end
-      def balance;         player.balance          end
-      def balance=(amount) player.balance=(amount) end
-      private :balance=
+      delegates_to_player :balance, :account_id
+      private_delegate_to_player :balance=
 
       def run_transfer_of(amount)
         self.balance += amount
