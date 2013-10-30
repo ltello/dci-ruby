@@ -1,4 +1,3 @@
-require 'forwardable'
 require 'dci-ruby'
 
 
@@ -17,8 +16,8 @@ class MoneyTransferContext < DCI::Context
   # Roles Definitions
 
     role :source_account do
-      extend ::Forwardable
-      def_delegators :player, :account_id, :balance, :balance=
+      delegates_to_player :balance, :account_id
+      private_delegate_to_player :balance=
 
       def run_transfer_of(amount)
         self.balance -= amount

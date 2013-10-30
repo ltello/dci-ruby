@@ -1,6 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-require 'ostruct'
-require 'forwardable'
+# require 'ostruct'
 
 
 describe 'Players:' do
@@ -19,9 +18,8 @@ describe 'Players:' do
 
     # Roles Definitions
       role :source_account do
-        extend ::Forwardable
-        def_delegators :player, :balance, :balance=
-        private :balance=
+        delegate_to_player :balance
+        private_delegate_to_player :balance=
 
         def run_transfer_of(amount)
           self.balance -= amount
@@ -29,9 +27,10 @@ describe 'Players:' do
       end
 
       role :target_account do
-        extend ::Forwardable
-        def_delegators :player, :balance, :balance=
-        private :balance=
+        delegate_to_player :balance
+        private_delegate_to_player :balance=
+        # def_delegators :player, :balance, :balance=
+        # private :balance=
 
         def run_transfer_of(amount)
           self.balance += amount
