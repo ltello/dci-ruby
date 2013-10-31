@@ -1,7 +1,6 @@
 require 'dci-ruby/dci/role'
 
 module DCI
-
   class Context
 
     class << self
@@ -118,17 +117,5 @@ module DCI
         instance_variable_set(:"@#{rolekey}", role_instance)
       end
 
-      # # For each given pair in vars, define a private method named the key that returns the entry associated value.
-      # def define_readers_for_no_players(vars={})
-      #   vars.each do |name, value|
-      #     instance_variable_set(:"@#{name}", value)
-      #     singleton_class.class_exec(name.to_sym) do |varkey|
-      #       private
-      #         attr_reader varkey
-      #     end
-      #   end
-      # end
-
   end
-
 end
