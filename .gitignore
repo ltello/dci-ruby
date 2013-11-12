@@ -50,3 +50,5 @@ pkg
 
 # RVM
 .rvmrc
+.ruby-version
+.ruby-gemset
