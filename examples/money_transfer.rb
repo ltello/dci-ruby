@@ -21,7 +21,7 @@ class MoneyTransferContext < DCI::Context
 
       def run_transfer_of(amount)
         self.balance -= amount
-        puts "\tAccount(\##{account_id}) sent #{amount}€ to Account(\##{target_account.account_id})."
+        puts "\t\tAccount(\##{account_id}) sent #{amount}€ to Account(\##{target_account.account_id})."
       end
     end
 
@@ -31,7 +31,7 @@ class MoneyTransferContext < DCI::Context
 
       def run_transfer_of(amount)
         self.balance += amount
-        puts "\tAccount(\##{account_id}) received #{amount}€ from Account(\##{source_account.account_id})."
+        puts "\t\tAccount(\##{account_id}) received #{amount}€ from Account(\##{source_account.account_id})."
       end
     end
 
@@ -39,10 +39,11 @@ class MoneyTransferContext < DCI::Context
   # Interactions
 
     def run(amount=settings(:amount))
-      puts "Balances Before: #{balances}"
+      puts "\nMoney Transfer of #{amount}€ between Account(\##{source_account.account_id}) and Account(\##{target_account.account_id})"
+      puts "\tBalances Before: #{balances}"
       source_account.run_transfer_of(amount)
       target_account.run_transfer_of(amount)
-      puts "Balances After:  #{balances}"
+      puts "\tBalances After:  #{balances}"
     end
 
 
