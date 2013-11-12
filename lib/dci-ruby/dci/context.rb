@@ -53,8 +53,8 @@ module DCI
           new_roleklass = roles[new_rolekey]
           mate_roles    = mate_roles_of(new_rolekey)
           mate_roles.each do |mate_rolekey, mate_roleklass|
-            mate_roleklass.add_role_reader_for!(new_rolekey)
-            new_roleklass.add_role_reader_for!(mate_rolekey)
+            mate_roleklass.send(:add_role_reader_for!, new_rolekey)
+            new_roleklass.send(:add_role_reader_for!, mate_rolekey)
           end
         end
 
