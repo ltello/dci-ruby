@@ -15,6 +15,11 @@ module DCI
         end
       end
 
+      # A short way for ContextSubclass.new(players_and_extra_args).run(extra_args)
+      def [](*args)
+        new(*args).run
+      end
+
 
       private
 

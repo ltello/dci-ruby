@@ -53,15 +53,22 @@ describe DCI::Context do
       before(:all) do
         class TestingUseContext < DCI::Context
           role :role1 do
+            def role1_method
+              :role1_method
+            end
           end
           role :role2 do
           end
 
-          def interaction1
-            role1
+          def run
+            role1.role1_method
           end
 
           def interaction2
+            role1
+          end
+
+          def interaction3
             role1.object_id - role2.object_id
           end
         end
@@ -70,7 +77,9 @@ describe DCI::Context do
         @context_instance_2 = TestingUseContext.new(:role1 => @player1, :role2 => @player2, :extra_arg => :extra)
       end
 
-      it("...instanciate it from its correspondig DCI::Context subclass...") {@context_instance_1.should be_a(TestingUseContext)}
+      it("...instanciate it from its correspondig DCI::Context subclass as usual...") do
+        @context_instance_1.should be_a(TestingUseContext)
+      end
       it("...providing pairs of type :rolekey1 => player1 as arguments...") do
         expect {TestingUseContext.new(@player1, @player2)}.to raise_error
       end
@@ -85,13 +94,20 @@ describe DCI::Context do
         expect {TestingUseContext.new(:role1 => @player1, :role2 => @player2, :extra_arg => :extra)}.not_to raise_error
       end
 
+      it("An shorter way to instantiate a context is through the class method []...") do
+        expect {TestingUseContext[:role1 => @player1, :role2 => @player2, :extra_arg => :extra]}.not_to raise_error
+      end
+      it("...which is equivalent to create a new instance and call #run on it.") do
+        TestingUseContext[:role1 => @player1, :role2 => @player2].should be(:role1_method)
+      end
+
 
       it("Once instanciated...") {@context_instance_1.should be_a(TestingUseContext)}
       it("...you call an interaction (instance method) on it") do
-        @context_instance_1.should respond_to(:interaction1)
+        @context_instance_1.should respond_to(:interaction2)
       end
       it("...to start interaction among roleplayers inside the context.") do
-        @context_instance_1.interaction2.should be_instance_of(Fixnum)
+        @context_instance_1.interaction3.should be_instance_of(Fixnum)
       end
 
     end
