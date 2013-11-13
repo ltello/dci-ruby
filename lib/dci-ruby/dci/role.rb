@@ -84,5 +84,10 @@ module DCI
         @player
       end
 
+      # The role definition code also have private access to the extra args given in the context instantiation.
+      def settings(*keys)
+        @context.send(:settings, *keys)
+      end
+
   end
 end

@@ -15,7 +15,11 @@ describe 'Interaction:' do
         end
       end
       @player1, @player2 = Object.new, Object.new
-      @test_interactions_context = TestingInteractionsContext.new(:role1 => @player1, :role2 => @player2, :setting1 => :one)
+      @test_interactions_context = TestingInteractionsContext.new(:role1 => @player1,
+                                                                  :role2 => @player2,
+                                                                  :setting1 => :one,
+                                                                  :setting2 => :two,
+                                                                  :setting3 => :three)
     end
 
     it("...the developer has access to all the roleplayers...") do
@@ -29,8 +33,14 @@ describe 'Interaction:' do
     it("He also have private access to extra args received in the instantiation of its context...") do
       @test_interactions_context.private_methods.should include('settings')
     end
-    it("...calling #settings(key)") do
-      @test_interactions_context.send(:settings, :setting1).should be(:one)
+    it("...calling #settings that returns a hash with all the extra args...") do
+      @test_interactions_context.send(:settings).should eq({:setting1 => :one, :setting2 => :two, :setting3 => :three})
+    end
+    it("...or #settings(key) that returns the value of the given extra arg...") do
+      @test_interactions_context.send(:settings, :setting2).should be(:two)
+    end
+    it("...or #settings(key1, key2, ...) that returns a hash with the given extra args.") do
+      @test_interactions_context.send(:settings, :setting1, :setting3).should eq({:setting1 => :one, :setting3 => :three})
     end
   end
 

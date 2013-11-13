@@ -33,7 +33,11 @@ describe 'RolePlayers' do
         end
       end
       @player1, @player2 = OpenStruct.new(:name => 'player1'), OpenStruct.new(:name => 'player2')
-      @testing_roleplayers_context = TestingRoleplayersContext.new(:role1 => @player1, :role2 => @player2)
+      @testing_roleplayers_context = TestingRoleplayersContext.new(:role1    => @player1,
+                                                                   :role2    => @player2,
+                                                                   :setting1 => :one,
+                                                                   :setting2 => :two,
+                                                                   :setting3 => :three)
     end
 
     it("...each one instance of the class defined after the role he plays...") do
@@ -72,6 +76,20 @@ describe 'RolePlayers' do
       @testing_roleplayers_context.send(:role2).instance_variables.should include('@context')
       @testing_roleplayers_context.send(:role2).instance_variable_get(:@context).should be(@testing_roleplayers_context)
     end
+
+    it("They also have private access to extra args received in the instantiation of its context...") do
+      @testing_roleplayers_context.private_methods.should include('settings')
+    end
+    it("...calling #settings that returns a hash with all the extra args...") do
+      @testing_roleplayers_context.send(:settings).should eq({:setting1 => :one, :setting2 => :two, :setting3 => :three})
+    end
+    it("...or #settings(key) that returns the value of the given extra arg...") do
+      @testing_roleplayers_context.send(:settings, :setting2).should be(:two)
+    end
+    it("...or #settings(key1, key2, ...) that returns a hash with the given extra args.") do
+      @testing_roleplayers_context.send(:settings, :setting1, :setting3).should eq({:setting1 => :one, :setting3 => :three})
+    end
+
   end
 
 end

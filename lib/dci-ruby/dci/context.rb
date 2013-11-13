@@ -83,8 +83,10 @@ module DCI
     private
 
       # Private access to the extra args received in the instantiation.
-      def settings(key)
-        @settings[key]
+      def settings(*keys)
+        return @settings.dup if keys.empty?
+        entries = @settings.reject {|k, v| !keys.include?(k)}
+        keys.size == 1 ? entries.values.first : entries
       end
 
       # Checks there is a player for each role.
