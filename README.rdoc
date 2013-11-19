@@ -49,24 +49,42 @@ Use the defined contexts, instantiating them, wherever you need in your code:
     MoneyTransfer.new(:source_account => Account.new(1),
                       :target_account => Account.new(2)).run(100)
 
+or the short preferred way:
+
+    MoneyTransfer[:source_account => Account.new(1),
+                  :target_account => Account.new(2),
+                  :amount         => 100]
+
 In a context instance, every role instantiates an object (roleplayer) that gathers the behaviour defined inside its role,
 and has private access to the original object adopting the role (player): the Account instances above are players.
-Instances of MoneyTransfer::SourceAccount and MoneyTransfer::TargetAccount accessible inside MoneyTransfer.new via
-the private instance_methods #source_account and #target_account are roleplayers.
-Also, every roleplayer has private access to the rest of roleplayers in its context.
+
+The instance of MoneyTransfer::SourceAccount and the one of MoneyTransfer::TargetAccount are roleplayers.
+They are accesible inside #run through #source_account and #target_account private methods.
+Also, every roleplayer has private access to the rest of roleplayers in the context.
 
 Unlike extending players with role modules this Presenter approach gets on well with ruby method call caching mechanism.
 (see Tony Arcieri's article {DCI in Ruby is completely broken}[http://tonyarcieri.com/dci-in-ruby-is-completely-broken])
 
-When instanciating a Context, the extra no-role pairs given as arguments are read-only attributes accessible inside the instance:
+When instanciating a Context, the extra no-role pairs given as arguments are read-only attributes accessible via #settings:
 
-    MoneyTransfer.new(:source_account => Account.new(1),
-                      :target_account => Account.new(2),
-                      :amount => 500).run
+    MoneyTransfer[:source_account => Account.new(1),
+                  :target_account => Account.new(2),
+                  :amount => 500]
 
-here, :amount is not a player (has no associated role) but is still privately accessible in the interactions via settings(:amount).
+here, :amount is not a player (has no associated role) but is still privately accessible in the interactions via #settings(:amount).
 
-See the examples[https://github.com/ltello/dci-ruby/tree/master/examples] folder for examples of use and the DCI-Sample[https://github.com/ltello/DCI-Sample] repository for a sample application using DCI through this gem.
+Inside a role definition, use the macro
+
+    delegate_to_player :player_methodname, :role_method_name
+
+to create a method delegating its behaviour to the object playing the role (player) so a roleplayer can also respond to a player's method.
+
+    delegates_to_player :methodname1, :methodname2... (for multiple methods delegation in just one sentence)
+
+There are also private counterpart macros (private_delegate_to_player and private_delegates_to_player) to create
+private delegations not accessible outside the roleplayer.
+
+See the examples[https://github.com/ltello/dci-ruby/tree/master/examples] folder for examples of use and the DCI-Sample[https://github.com/ltello/DCI-Sample] repository for a sample Rails application using DCI through this gem.
 
 == Copyright
 

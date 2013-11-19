@@ -88,6 +88,8 @@ module DCI
     private
 
       # Private access to the extra args received in the instantiation.
+      # Returns a hash (copy of the instantiation extra args) with only the args included in 'keys' or all of them
+      # when called with no args.
       def settings(*keys)
         return @settings.dup if keys.empty?
         entries = @settings.reject {|k, v| !keys.include?(k)}

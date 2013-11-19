@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dci-ruby (2.1.2)
+    dci-ruby (2.2.0)
 
 GEM
   remote: http://rubygems.org/
