@@ -71,7 +71,8 @@ When instanciating a Context, the extra no-role pairs given as arguments are rea
                   :target_account => Account.new(2),
                   :amount => 500]
 
-here, :amount is not a player (has no associated role) but is still privately accessible in the interactions via #settings(:amount).
+here, :amount is not a player (has no associated role) but is still privately accessible both in the interactions and the roles
+via #settings(:amount).
 
 Inside a role definition, use the macro
 
@@ -82,9 +83,13 @@ to create a method delegating its behaviour to the object playing the role (play
     delegates_to_player :methodname1, :methodname2... (for multiple methods delegation in just one sentence)
 
 There are also private counterpart macros (private_delegate_to_player and private_delegates_to_player) to create
-private delegations not accessible outside the roleplayer.
+private delegations not accessible outside a roleplayer.
 
 See the examples[https://github.com/ltello/dci-ruby/tree/master/examples] folder for examples of use and the DCI-Sample[https://github.com/ltello/DCI-Sample] repository for a sample Rails application using DCI through this gem.
+
+Notice how your models and controllers are not overloaded anymore. They are thinner and simpler.
+Also note how now most of the functionality of the system is now isolated, totally dry-ied and easily maintainable in the different context classes.
+
 
 == Copyright
 
