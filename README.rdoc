@@ -88,7 +88,7 @@ private delegations not accessible outside a roleplayer.
 See the examples[https://github.com/ltello/dci-ruby/tree/master/examples] folder for examples of use and the DCI-Sample[https://github.com/ltello/DCI-Sample] repository for a sample Rails application using DCI through this gem.
 
 Notice how your models and controllers are not overloaded anymore. They are thinner and simpler.
-Also note how now most of the functionality of the system is now isolated, totally dry-ied and easily maintainable in the different context classes.
+Also note how now most of the functionality of the system is isolated, totally dry-ied and easily maintainable in the different context classes.
 
 
 == Copyright
