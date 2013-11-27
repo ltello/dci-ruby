@@ -21,27 +21,30 @@ dci-ruby gives you the class DCI::Context to inherit from to create your own con
     class MoneyTransfer < DCI::Context
 
       # Roles
-          role :source_account do
-            def transfer(amount)
-              player.balance -= amount
-            end
-          end
 
-          role :target_account do
-            def get_transfer(amount)
-              player.balance += amount
-            end
-          end
+      role :source_account do
+        def transfer(amount)
+          player.balance -= amount
+        end
+      end
+
+      role :target_account do
+        def get_transfer(amount)
+          player.balance += amount
+        end
+      end
+
 
       # Interactions
-          def run(amount=settings(:amount))
-            source_account.transfer(amount)
-            target_account.get_transfer(amount)
-          end
+
+      def run(amount = settings(:amount))
+        source_account.transfer(amount)
+        target_account.get_transfer(amount)
+      end
     end
 
 Every context defines some roles to be played by external objects (players) and their interactions. This way
-you have all the agents and operations in a user case wrapped in just one entity instead of spread out throughout the
+you have all the agents and operations in a use case wrapped in just one entity instead of spread out throughout the
 application code.
 
 Use the defined contexts, instantiating them, wherever you need in your code:
